@@ -35,22 +35,13 @@ void setup() {
     while (1);
   }
 
-  // --------------------------------------------------------
-  // Optimize both sensors for High Accuracy / 60cm range
-  // --------------------------------------------------------
-  // Increase timing budget to 200ms (200000 us) for better precision at mid-range
   sensor1.setMeasurementTimingBudget(200000);
   sensor2.setMeasurementTimingBudget(200000);
-
-  // Increase the pulse period stages to optimize for distances up to ~1 meter
-  // This significantly improves consistency within your 60 cm limit
   sensor1.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
   sensor1.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
   
   sensor2.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
   sensor2.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
-
-  // Start continuous back-to-back mode (0 = fastest internal loop)
   sensor1.startContinuous(0);
   sensor2.startContinuous(0);
 
@@ -58,16 +49,13 @@ void setup() {
 }
 
 void loop() {
-  // Read distances in millimeters
   uint16_t distance1 = sensor1.readRangeContinuousMillimeters();
   uint16_t distance2 = sensor2.readRangeContinuousMillimeters();
 
-  // Process Sensor 1 (Cap or flag anything past 600mm)
   Serial.print("S1: ");
   if (sensor1.timeoutOccurred()) {
     Serial.print("TIMEOUT");
   } else if (distance1 > 600 || distance1 >= 8190) { 
-    // 8190 is the default Pololu overflow value when no target is detected
     Serial.print(">600mm (Out of Bounds)");
   } else {
     Serial.print(distance1);
@@ -76,7 +64,6 @@ void loop() {
 
   Serial.print(" | ");
 
-  // Process Sensor 2
   Serial.print("S2: ");
   if (sensor2.timeoutOccurred()) {
     Serial.print("TIMEOUT");
@@ -89,5 +76,5 @@ void loop() {
 
   Serial.println();
 
-  delay(100); // Polling intervals
+  delay(100);
 }
